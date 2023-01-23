@@ -1,11 +1,14 @@
-import {insertEntry, returnEntries, returnEntry} from "../repositories/entries.repositories.js";
+import {entryDelete, insertEntry, returnEntries, returnEntry} from "../repositories/entries.repositories.js";
 import { Request, Response } from "express";
+import { EntryEntity } from "../protocols.js";
+import { QueryResult } from "pg";
 
-export async function getEntriesList(req: Request, res: Response) {
+export async function getEntriesList(req: Request, res: Response){
     try {
-        const entriesList = await returnEntries();
+        const entriesList: QueryResult<EntryEntity> = await returnEntries();
         res.send(entriesList.rows)
     } catch (error) {
+        console.log(error)
         return res.sendStatus(500)
     }
 }
@@ -13,9 +16,10 @@ export async function getEntriesList(req: Request, res: Response) {
 export async function getEntry(req: Request, res: Response) {
     const { id } = req.params;
     try {
-        const entry = await returnEntry(id);
-        return res.send(entry);
+        const entry: QueryResult<EntryEntity> = await returnEntry(id);
+        return res.send(entry.rows[0]);
     } catch (error) {
+        console.log(error)
         return res.sendStatus(500)
     }
 }
@@ -36,5 +40,11 @@ export async function editEntry(req: Request, res: Response) {
 }
 
 export async function deleteEntry(req: Request, res: Response) {
-    return;
+    const { id } = req.params;
+    try {
+        await entryDelete(id);
+        return res.status(200).send(`Diary entry ${id} deleted.`)
+    } catch (error) {
+        return res.sendStatus(500);
+    }
 }
