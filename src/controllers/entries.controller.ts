@@ -1,4 +1,4 @@
-import {entryDelete, insertEntry, returnEntries, returnEntry} from "../repositories/entries.repositories.js";
+import {entryDelete, entryEdit, insertEntry, returnEntries, returnEntry} from "../repositories/entries.repositories.js";
 import { Request, Response } from "express";
 import { EntryEntity } from "../protocols.js";
 import { QueryResult } from "pg";
@@ -36,7 +36,14 @@ export async function postEntry(req: Request, res: Response) {
 }
 
 export async function editEntry(req: Request, res: Response) {
-    return;
+    const { id } = req.params;
+    const { text } = req.body;
+    try {
+        await entryEdit(id, text)
+        return res.status(200).send(`Entry number ${id} edited.`)
+    } catch (error) {
+        res.sendStatus(500);
+    }
 }
 
 export async function deleteEntry(req: Request, res: Response) {

@@ -19,9 +19,8 @@ export function insertEntry(title, text) {
   );
 }
 
-export function entryEdit(entry) {
-  // return db.query();
-  return;
+export function entryEdit(id, text) {
+  return db.query(`UPDATE entries SET text=$2 WHERE id=$1;`, [id, text]);
 }
 
 export function entryDelete(id) {
