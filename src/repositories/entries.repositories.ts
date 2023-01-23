@@ -1,7 +1,8 @@
+import { QueryResult } from "pg";
 import { db } from "../config/db.js";
 import { EntryEntity } from "../protocols.js";
 
-export function returnEntries() {
+export function returnEntries(): Promise<QueryResult<EntryEntity>> {
   return db.query(`SELECT id, title, "viewCount" FROM entries;`);
 }
 
