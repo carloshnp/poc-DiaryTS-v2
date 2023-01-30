@@ -3,7 +3,7 @@ import {
   entryEdit,
   insertEntry,
   returnEntries,
-  returnEntry
+  returnEntry,
 } from "../repositories/entries.repositories.js";
 import { Request, Response } from "express";
 import { EntryEntity } from "../protocols.js";
@@ -34,11 +34,14 @@ export async function getEntry(req: Request, res: Response): Promise<Response> {
   }
 }
 
-export async function postEntry(req: Request, res: Response): Promise<Response> {
+export async function postEntry(
+  req: Request,
+  res: Response
+): Promise<Response> {
   const entry: EntryEntity = req.body;
-  const { error } = entryValidationSchema.validate(entry)
+  const { error } = entryValidationSchema.validate(entry);
   if (error) {
-    return res.status(400).send("Insert a valid title and text!")
+    return res.status(400).send("Insert a valid title and text!");
   }
   try {
     const post: QueryResult<EntryEntity> = await insertEntry(
@@ -52,7 +55,10 @@ export async function postEntry(req: Request, res: Response): Promise<Response> 
   }
 }
 
-export async function editEntry(req: Request, res: Response): Promise<Response> {
+export async function editEntry(
+  req: Request,
+  res: Response
+): Promise<Response> {
   const { id } = req.params;
   const { text } = req.body as Record<string, string>;
   try {
@@ -63,7 +69,10 @@ export async function editEntry(req: Request, res: Response): Promise<Response> 
   }
 }
 
-export async function deleteEntry(req: Request, res: Response): Promise<Response> {
+export async function deleteEntry(
+  req: Request,
+  res: Response
+): Promise<Response> {
   const { id } = req.params;
   try {
     await entryDelete(id);
