@@ -9,6 +9,7 @@ import { Request, Response } from "express";
 import { EntryEntity } from "../protocols.js";
 import { QueryResult } from "pg";
 import { entryValidationSchema } from "../schemas/entries.schema.js";
+import {number} from "joi";
 
 export async function getEntriesList(
   req: Request,
@@ -16,7 +17,7 @@ export async function getEntriesList(
 ): Promise<Response> {
   try {
     const entriesList = await returnEntries();
-    res.send(entriesList.rows);
+    res.send(entriesList);
   } catch (error) {
     console.log(error);
     return res.sendStatus(500);
@@ -24,10 +25,10 @@ export async function getEntriesList(
 }
 
 export async function getEntry(req: Request, res: Response): Promise<Response> {
-  const { id } = req.params;
+  const id  = req.params.id;
   try {
-    const entry: QueryResult<EntryEntity> = await returnEntry(id);
-    return res.send(entry.rows[0]);
+    const entry = await returnEntry(id);
+    return res.send(entry);
   } catch (error) {
     console.log(error);
     return res.sendStatus(500);
@@ -44,11 +45,11 @@ export async function postEntry(
     return res.status(400).send("Insert a valid title and text!");
   }
   try {
-    const post: QueryResult<EntryEntity> = await insertEntry(
+    const post = await insertEntry(
       entry.title,
       entry.text
     );
-    return res.status(200).send(post.rows[0]);
+    return res.status(200).send(post);
   } catch (error) {
     console.log(error);
     return res.sendStatus(500);
@@ -65,6 +66,7 @@ export async function editEntry(
     await entryEdit(id, text);
     return res.status(200).send(`Entry number ${id} edited.`);
   } catch (error) {
+    console.log(error)
     res.sendStatus(500);
   }
 }

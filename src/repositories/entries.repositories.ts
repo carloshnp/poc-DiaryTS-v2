@@ -1,29 +1,54 @@
 import { QueryResult } from "pg";
-import { db } from "../config/db.js";
+import prisma from "../config/db.js"
 import { EntryEntity } from "../protocols.js";
 
-export function returnEntries(): Promise<QueryResult<EntryEntity>> {
-  return db.query(`SELECT id, title, "viewCount" FROM entries;`);
+export function returnEntries() {
+  return prisma.entries.findMany();
 }
 
-export function returnEntry(id) {
-  db.query(`UPDATE entries SET "viewCount" = "viewCount" + 1 WHERE id=$1;`, [
-    id
-  ]);
-  return db.query(`SELECT title, text FROM entries WHERE id=$1;`, [id]);
+export async function returnEntry(id) {
+  await prisma.entries.update({
+    where: {
+      id: parseInt(id)
+    },
+    data: {
+      viewCount: {
+        increment: 1
+      }
+    }
+  }) 
+  return prisma.entries.findFirst({
+    where: {
+      id: parseInt(id)
+    }
+  })
 }
 
 export function insertEntry(title, text) {
-  return db.query(
-    `INSERT INTO entries ("title", "text", "viewCount") VALUES ($1, $2, $3) RETURNING id;`,
-    [title, text, 0]
-  );
+  return prisma.entries.create({
+    data: {
+      title,
+      text,
+      viewCount: 0
+    }
+  })
 }
 
 export function entryEdit(id, text) {
-  return db.query(`UPDATE entries SET text=$2 WHERE id=$1;`, [id, text]);
+  return prisma.entries.update({
+    where: {
+      id: parseInt(id)
+    },
+    data: {
+      text
+    }
+  })
 }
 
 export function entryDelete(id) {
-  return db.query(`DELETE FROM entries WHERE id=$1;`, [id]);
+  return prisma.entries.delete({
+    where: {
+      id: parseInt(id)
+    }
+  })
 }
